@@ -1,6 +1,6 @@
 name: Tests
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   tests:
@@ -27,4 +27,8 @@ jobs:
         run: php artisan key:generate
 
       - name: Execute tests
+        env:
+          JIRA_HOST: ${{ secrets.JIRA_HOST }}
+          JIRA_USER: ${{ secrets.JIRA_USER }}
+          JIRA_PASS: ${{ secrets.JIRA_PASS }}
         run: vendor/bin/phpunit
