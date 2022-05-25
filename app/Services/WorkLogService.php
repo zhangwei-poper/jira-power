@@ -54,7 +54,7 @@ class WorkLogService
             }
         }
 
-        return $text;
+        return join("\n", $text);
     }
 
     private static function formatContentToTextLines($content): array

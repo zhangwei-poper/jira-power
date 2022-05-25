@@ -16,3 +16,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [Controller::class, 'index']);
 Route::post('/', [Controller::class, 'dailyReport'])->name('daily-report');
+
+Route::post('/api/daily-report', [Controller::class, 'dailyReportApi']);

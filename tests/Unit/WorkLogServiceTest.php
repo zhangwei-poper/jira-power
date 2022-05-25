@@ -51,12 +51,13 @@ class WorkLogServiceTest extends TestCase
 
         $service = new WorkLogService($issueService);
         $text = $service->getWorkLogsPlainText();
-        self::assertSame([
-            '1. TEST-1 test (1h)',
-            '    - test line 1',
-            '    - test line 2',
-            '    - test line 3 from paragraph',
-            '',
-        ], $text);
+        self::assertSame(<<<EOT
+1. TEST-1 test (1h)
+    - test line 1
+    - test line 2
+    - test line 3 from paragraph
+
+EOT,
+            $text);
     }
 }

@@ -18,7 +18,7 @@ class Controller extends BaseController
     public function index(Request $request)
     {
         return view('welcome', [
-            'defaults' => $this->getDefaults($request),
+            'defaults' => $this->getDefaultsFromCookie($request),
         ]);
     }
 
@@ -33,22 +33,23 @@ class Controller extends BaseController
 家
 EOT;
 
+    const FORM_INPUTS = [
+        'jira_host' => 'required|url',
+        'jira_user' => 'required|email',
+        'jira_pass' => 'required',
+    ];
+
 
     public function dailyReport(Request $request)
     {
-        $params = $request->validate([
-            'jira_host' => 'required|url',
-            'jira_user' => 'required|email',
-            'jira_pass' => 'required',
-        ]);
-
+        $params = $request->validate(self::FORM_INPUTS);
         $cookie = cookie();
-        $cookie->queue('jira_host', $params['jira_host']);
-        $cookie->queue('jira_user', $params['jira_user']);
-        $cookie->queue('jira_pass', $params['jira_pass']);
+        foreach ($params as $key => $value) {
+            $cookie->queue($key, $value);
+        }
 
         try {
-            $dailyReportLines = $this->createService(
+            $text = $this->createService(
                 $params['jira_host'],
                 $params['jira_user'],
                 $params['jira_pass']
@@ -57,14 +58,36 @@ EOT;
             report($exception);
             return view('welcome', [
                 'error'    => $exception->getMessage(),
-                'defaults' => $this->getDefaults($request),
+                'defaults' => $this->getDefaultsFromInput($request),
             ]);
         }
 
         return view('welcome', [
-            'text'     => sprintf(self::DAILY_REPORT_TEMPLATE, implode("\n", $dailyReportLines)),
-            'defaults' => $this->getDefaults($request),
+            'text'     => sprintf(self::DAILY_REPORT_TEMPLATE, $text),
+            'defaults' => $this->getDefaultsFromInput($request),
         ]);
+    }
+
+    public function dailyReportApi(Request $request)
+    {
+        $params = $request->validate(self::FORM_INPUTS);
+        try {
+            $text = $this->createService(
+                $params['jira_host'],
+                $params['jira_user'],
+                $params['jira_pass']
+            )->getWorkLogsPlainText();
+
+            return response()->json([
+                'text' => sprintf(self::DAILY_REPORT_TEMPLATE, $text),
+            ]);
+
+        } catch (\Exception $exception) {
+            report($exception);
+            return response()->json([
+                'error' => $exception->getMessage(),
+            ], 500);
+        }
     }
 
     private function createService($jiraHost, $jiraUser, $jiraPassword)
@@ -81,13 +104,23 @@ EOT;
         );
     }
 
-    private function getDefaults(Request $request)
+
+    private function getDefaultsFromCookie(Request $request)
     {
-        return [
-            'jira_host' => $request->cookie('jira_host'),
-            'jira_user' => $request->cookie('jira_user'),
-            'jira_pass' => $request->cookie('jira_pass'),
-        ];
+        $defaults = [];
+        foreach (array_keys(self::FORM_INPUTS) as $key) {
+            $defaults[$key] = $request->cookie($key);
+        }
+        return $defaults;
+    }
+
+    private function getDefaultsFromInput(Request $request)
+    {
+        $defaults = [];
+        foreach (array_keys(self::FORM_INPUTS) as $key) {
+            $defaults[$key] = $request->input($key);
+        }
+        return $defaults;
     }
 
 }
