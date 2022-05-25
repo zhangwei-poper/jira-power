@@ -108,12 +108,18 @@
                                value="{{ $defaults['jira_pass'] }}">
                         <div class="form-text">
                             Visit <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">API Tokens</a>
-                            create new api token. We will encrypt your token and store it in the cookie.
+                            create new api token.
+                            <br>
+                            We will not save your token on the server, just use it to generate report.
+                            <br>
+                            Token will be encrypted and stored in cookie.
                         </div>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-primary mb-3">Generate</button>
+                <div class="mb-3 row">
+                    <div class="col-sm-10 offset-sm-2">
+                        <button type="submit" class="btn btn-primary">Generate</button>
+                    </div>
                 </div>
             </form>
         </div>
