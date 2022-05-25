@@ -13,10 +13,11 @@ class WorkLogService
 
     public function getWorkLogsPlainText(CarbonImmutable $date = null)
     {
-        $date = $date ?? CarbonImmutable::today();
+        $date = $date ?: CarbonImmutable::today();
+        $dateString = $date->isToday() ? 'now()' : $date->toDateString();
 
         $works = [];
-        $result = $this->issueService->search('worklogAuthor = currentUser() and worklogDate = now()');
+        $result = $this->issueService->search("worklogAuthor = currentUser() and worklogDate = {$dateString}");
         foreach ($result->issues as $issue) {
             $issueTitle = "{$issue->key} {$issue->fields->summary}";
             $works[$issueTitle] = [];
@@ -26,7 +27,7 @@ class WorkLogService
             }
 
             foreach ($workLogs->getWorklogs() as $workLog) {
-                $workLogStartedDate = CarbonImmutable::parse($workLog->started);
+                $workLogStartedDate = CarbonImmutable::parse($workLog->started, $date->getTimezone());
                 if (!$workLogStartedDate->isSameDay($date)) {
                     continue;
                 }
@@ -47,8 +48,9 @@ class WorkLogService
                 $text[] = "$nth. $issueTitle ({$workLog['timeSpent']})";
                 $nth++;
                 foreach ($workLog['content_plain'] as $line) {
-                    $text[] = "\t$line";
+                    $text[] = "    - " . ltrim(trim($line), "- \t\n\r\0\x0B");
                 }
+                $text[] = '';
             }
         }
 
@@ -68,11 +70,6 @@ class WorkLogService
 
                 case 'text':
                     $text = array_merge($text, explode("\n", $block->text));
-                    break;
-
-                case 'codeBlock':
-                case 'paragraph':
-                    $text = array_merge($text, self::formatContentToTextLines($block->content));
                     break;
             }
         }

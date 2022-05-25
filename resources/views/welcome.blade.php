@@ -3,9 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
+    <meta name="author" content="zhwei">
     <title>Generate daily report from JIRA work logs</title>
 
     <!-- Bootstrap core CSS -->
@@ -70,7 +68,7 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav me-auto mb-2 mb-md-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">JIRA Power</a>
+                        <a class="nav-link active" aria-current="page" href="/">JIRA Power</a>
                     </li>
                 </ul>
             </div>
@@ -85,26 +83,33 @@
         <div class="row justify-content-md-center">
             <form class="form" method="post">
                 {{ csrf_field() }}
-                <div class="mb-3">
-                    <label for="jira_host" class="form-label">JIRA Host</label>
-                    <input type="url" class="form-control" id="jira_host" name="jira_host"
-                           placeholder="https://company_name.atlassian.net"
-                           value="{{ $defaults['jira_host'] }}">
+                <div class="mb-3 row">
+                    <label for="jira_host" class="col-sm-2 col-form-label">JIRA Host</label>
+                    <div class="col-sm-10">
+                        <input type="url" class="form-control" id="jira_host" name="jira_host"
+                               placeholder="https://company_name.atlassian.net"
+                               value="{{ $defaults['jira_host'] }}">
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="jira_user" class="form-label">Your account's email address</label>
-                    <input type="text" class="form-control" id="jira_user" name="jira_user"
-                           placeholder="tom@jerry.com"
-                           value="{{ $defaults['jira_user'] }}">
+                <div class="mb-3 row">
+                    <label for="jira_user" class="col-sm-2 col-form-label">Your JIRA email</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="jira_user" name="jira_user"
+                               placeholder="tom@jerry.com"
+                               value="{{ $defaults['jira_user'] }}">
+                    </div>
+
                 </div>
-                <div class="mb-3">
-                    <label for="jira_pass" class="form-label">Your account's token</label>
-                    <input type="text" class="form-control" id="jira_pass" name="jira_pass"
-                           placeholder="xxx"
-                           value="{{ $defaults['jira_pass'] }}">
-                    <div class="form-text">
-                        Visit <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">API Tokens</a>
-                        create new api token.
+                <div class="mb-3 row">
+                    <label for="jira_pass" class="col-sm-2 col-form-label">Your JIRA token</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="jira_pass" name="jira_pass"
+                               placeholder="xxx"
+                               value="{{ $defaults['jira_pass'] }}">
+                        <div class="form-text">
+                            Visit <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">API Tokens</a>
+                            create new api token. We will encrypt your token and store it in the cookie.
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
