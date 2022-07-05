@@ -37,6 +37,7 @@ EOT;
         'jira_host' => 'required|url',
         'jira_user' => 'required|email',
         'jira_pass' => 'required',
+        'others'    => 'nullable',
     ];
 
 
@@ -53,7 +54,7 @@ EOT;
                 $params['jira_host'],
                 $params['jira_user'],
                 $params['jira_pass']
-            )->getWorkLogsPlainText();
+            )->getWorkLogsPlainTextContent();
         } catch (\Exception $exception) {
             report($exception);
             return view('welcome', [
@@ -63,9 +64,36 @@ EOT;
         }
 
         return view('welcome', [
-            'text'     => sprintf(self::DAILY_REPORT_TEMPLATE, $text),
+            'text'     => self::formatContentToText($text, $params['others'] ?? ''),
             'defaults' => $this->getDefaultsFromInput($request),
         ]);
+    }
+
+    private static function formatContentToText(array $content, $others)
+    {
+        $lines = [];
+        foreach ($content as $nth => $part) {
+            $lines[] = "$nth. {$part['title']} ({$part['cost']})";
+            foreach ($part['content'] as $line) {
+                $lines[] = "    - " . $line;
+            }
+            $lines[] = "";
+        }
+
+        if ($others) {
+            $nth = ($nth ?? 0) + 1;
+            foreach (explode("\n", $others) as $line) {
+                if (!trim($line)) {
+                    continue;
+                }
+
+                $lines[] = "$nth. {$line}";
+                $lines[] = "";
+                $nth++;
+            }
+        }
+
+        return sprintf(self::DAILY_REPORT_TEMPLATE, implode("\n", $lines));
     }
 
     public function dailyReportApi(Request $request)
@@ -76,10 +104,10 @@ EOT;
                 $params['jira_host'],
                 $params['jira_user'],
                 $params['jira_pass']
-            )->getWorkLogsPlainText();
+            )->getWorkLogsPlainTextContent();
 
             return response()->json([
-                'text' => sprintf(self::DAILY_REPORT_TEMPLATE, $text),
+                'content' => $text,
             ]);
 
         } catch (\Exception $exception) {

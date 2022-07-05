@@ -50,14 +50,19 @@ class WorkLogServiceTest extends TestCase
 
 
         $service = new WorkLogService($issueService);
-        $text = $service->getWorkLogsPlainText();
-        self::assertSame(<<<EOT
-1. TEST-1 test (1h)
-    - test line 1
-    - test line 2
-    - test line 3 from paragraph
-
-EOT,
-            $text);
+        $text = $service->getWorkLogsPlainTextContent();
+        self::assertSame([
+            1 =>
+                [
+                    'title'   => 'TEST-1 test',
+                    'content' =>
+                        [
+                            'test line 1',
+                            'test line 2',
+                            'test line 3 from paragraph',
+                        ],
+                    'cost'    => '1h',
+                ],
+        ], $text);
     }
 }

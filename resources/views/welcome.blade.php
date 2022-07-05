@@ -117,6 +117,13 @@
                     </div>
                 </div>
                 <div class="mb-3 row">
+                    <label for="others" class="col-sm-2 col-form-label">Other Items</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="others" name="others"
+                                  placeholder="xxx" rows="7">{{ $defaults['others'] }}</textarea>
+                    </div>
+                </div>
+                <div class="mb-3 row">
                     <div class="col-sm-10 offset-sm-2">
                         <button type="submit" class="btn btn-primary">Generate</button>
                     </div>

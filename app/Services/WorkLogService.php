@@ -11,7 +11,7 @@ class WorkLogService
     {
     }
 
-    public function getWorkLogsPlainText(CarbonImmutable $date = null)
+    public function getWorkLogsPlainTextContent(CarbonImmutable $date = null): array
     {
         $date = $date ?: CarbonImmutable::today();
         $dateString = $date->isToday() ? 'now()' : $date->toDateString();
@@ -45,16 +45,18 @@ class WorkLogService
         $nth = 1;
         foreach ($works as $issueTitle => $work) {
             foreach ($work as $workLog) {
-                $text[] = "$nth. $issueTitle ({$workLog['timeSpent']})";
-                $nth++;
+                $part = [
+                    'title'   => $issueTitle,
+                    'content' => [],
+                    'cost'    => $workLog['timeSpent'],
+                ];
                 foreach ($workLog['content_plain'] as $line) {
-                    $text[] = "    - " . ltrim(trim($line), "- \t\n\r\0\x0B");
+                    $part['content'][] = ltrim(trim($line), "- \t\n\r\0\x0B");
                 }
-                $text[] = '';
+                $text[$nth++] = $part;
             }
         }
-
-        return join("\n", $text);
+        return $text;
     }
 
     private static function formatContentToTextLines($content): array
