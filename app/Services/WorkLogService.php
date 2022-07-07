@@ -31,6 +31,9 @@ class WorkLogService
                 if (!$workLogStartedDate->isSameDay($date)) {
                     continue;
                 }
+                if (false === isset($workLog->author['emailAddress'])) {
+                    continue; // skip worklogs not from current user
+                }
 
                 $works[$issueTitle][] = [
                     'timeSpent'     => $workLog->timeSpent,
