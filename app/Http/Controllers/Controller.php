@@ -46,7 +46,7 @@ EOT;
         $params = $request->validate(self::FORM_INPUTS);
         $cookie = cookie();
         foreach ($params as $key => $value) {
-            $cookie->forever($key, $value);
+            $cookie->queue($cookie->forever($key, $value, secure: false));
         }
 
         try {
