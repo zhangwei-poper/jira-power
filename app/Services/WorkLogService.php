@@ -36,7 +36,7 @@ class WorkLogService
                 }
 
                 $works[$issueTitle][] = [
-                    'timeSpent'     => $workLog->timeSpent,
+                    'timeSpent'     => self::formatTimeSpent($workLog->timeSpentSeconds),
                     'content'       => $workLog->comment->content,
                     'content_plain' => self::formatContentToTextLines($workLog->comment->content),
                 ];
@@ -60,6 +60,21 @@ class WorkLogService
             }
         }
         return $text;
+    }
+
+    private static function formatTimeSpent($timeSpentSeconds): string
+    {
+        $hours = intval($timeSpentSeconds / 3600);
+        $minutes = $timeSpentSeconds / 60 % 60;
+
+        $str = '';
+        if ($hours > 0) {
+            $str .= $hours . 'h';
+        }
+        if ($minutes > 0) {
+            $str .= ($str ? ' ' : '') . $minutes . 'm';
+        }
+        return $str;
     }
 
     private static function formatContentToTextLines($content): array
